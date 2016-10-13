@@ -62,7 +62,20 @@ class MoviesController < ApplicationController
   end
   
   def search_tmdb
-    @movies=Movie.find_in_tmdb(params[:search_terms])
+    #@movies=Movie.find_in_tmdb(params[:search_terms
+    
+    title = params[:search_terms]
+    @movies = Movie.find_in_tmdb(title)
+    if title.nil? or title == ''
+      flash[:warning] = 'No title given.'
+      redirect_to movies_path and return
+    elsif Movie.find_by_title(title).present?
+      #TODO highlight existing movie
+      redirect_to movies_path and return
+    elsif @movies.empty?
+      flash[:notice] = "'#{title}' was not found in TMDb."
+      redirect_to movies_path and return
+    end
   end
 
 end

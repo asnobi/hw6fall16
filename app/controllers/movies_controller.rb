@@ -78,4 +78,16 @@ class MoviesController < ApplicationController
     end
   end
 
+
+
+#Aziz
+def add_tmdb
+    if params[:tmdb_movies]
+      params[:tmdb_movies].keys.each {|movie| puts Movie.create_from_tmdb(movie)}
+      flash[:notice] = "Movies successfully added to Rotten Potatoes"
+    else
+      flash[:notice] = "No movies selected"
+    end
+    redirect_to movies_path
+end
 end

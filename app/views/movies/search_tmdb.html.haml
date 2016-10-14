@@ -1,24 +1,18 @@
-%table#movies
-  %thead
-    %tr
-      %th Movie Title
-      %th Rating
-      %th Release Date
-      %th Select
-
-
-  %tbody
-    - @movies.each_with_index do |movie|
+= form_tag movies_add_tmdb_path, :method => :post, :id => 'add_form' do
+  %table#movies
+    %thead
       %tr
-        
-        %td= movie.title
-        %td= movie.vote_average
-        %td= movie.release_date
-        %td= check_box_tag 'tmdb_ids[]', movie.id
-        /%td= movie.certification? 'Not rated' : movie.certification
-        /%td= movie.director
-        /%td= movie.released.blank? ? 'Unknown' : movie.released
-        /%td= movie.rating
-        /%td= link_to "More about #{movie.name}", movie.url
-= submit_tag 'Add selected movie'
-= link_to 'Return to movie list', movies_path
+        %th Movie Title
+        %th Rating
+        %th Release Date
+        %th Select
+    %tbody
+      - @movies.each do |movie|
+        %tr
+          %td= movie[:title]
+          %td= movie[:rating]
+          %td= movie[:release_date]
+          %td= check_box_tag "tmdb_movies[#{movie[:tmdb_id]}]"
+  
+  = submit_tag 'Add Selected Movies'
+= link_to 'Return to Movie List', movies_path

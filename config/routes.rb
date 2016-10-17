@@ -19,6 +19,9 @@ Rails.application.routes.draw do
   root :to => redirect('/movies')
   post 'movies/search_tmdb'
   post 'movies/add_tmdb'
+#  post 'movies/index2'
+  get "coverage", to: "coverage#index"
+  
   
   
   # Example resource route with options:

@@ -60,34 +60,37 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
-  
+ 
   def search_tmdb
-    #@movies=Movie.find_in_tmdb(params[:search_terms
+    @search_terms = params[:search_terms]
     
-    title = params[:search_terms]
-    @movies = Movie.find_in_tmdb(title)
-    if title.nil? or title == ''
-      flash[:warning] = 'No title given.'
-      redirect_to movies_path and return
-    elsif Movie.find_by_title(title).present?
-      #TODO highlight existing movie
-      redirect_to movies_path and return
-    elsif @movies.empty?
-      flash[:notice] = "'#{title}' was not found in TMDb."
-      redirect_to movies_path and return
+    if @search_terms.nil? or @search_terms.empty?
+      flash[:warning] = 'Invalid search term'
+      redirect_to movies_path
+     
+    else
+      @movies = Movie.find_in_tmdb(@search_terms)
+
+      if(@movies == nil || @movies.count == 0 )
+        flash[:notice] = "No matching movies were found on TMDb"
+        redirect_to movies_path
+      end
     end
+  
   end
 
-
-
-#Aziz
-def add_tmdb
-    if params[:tmdb_movies]
-      params[:tmdb_movies].keys.each {|movie| puts Movie.create_from_tmdb(movie)}
-      flash[:notice] = "Movies successfully added to Rotten Potatoes"
+  def add_tmdb
+    m_to_add = params[:tmdb_movies]
+    if m_to_add.nil?
+      flash[:notice] = "No movies were added"
     else
-      flash[:notice] = "No movies selected"
+      m_keys = m_to_add.keys
+      m_keys.each do |id|
+        Movie.create_from_tmdb(id)
+        flash[:notice] = "Movies successfully added to Rotten Potatoes"
+      end
     end
     redirect_to movies_path
-end
+  end
+
 end

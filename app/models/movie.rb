@@ -7,56 +7,59 @@ require	'themoviedb'
     %w(G PG PG-13 NC-17 R)
   end
   
-# class Movie::InvalidKeyError < StandardError ; end
-  
-#  def self.find_in_tmdb(string)
-#    begin
-#      Tmdb::Movie.find(string)
-#    rescue Tmdb::InvalidApiKeyError
-#        raise Movie::InvalidKeyError, 'Invalid API key'
-#    end
-#  end
+class Movie::InvalidKeyError < StandardError ; end
 
-
-
-def self.find_in_tmdb(string)
-    Tmdb::Api.key("f4702b08c0ac6ea5b51425788bb26562")
+  def self.find_in_tmdb(string)
     begin
-    
-    #Aziz
+      Tmdb::Api.key("f4702b08c0ac6ea5b51425788bb26562")
       movies = []
-      Tmdb::Movie.find(string).each do |movie|
-        movies << {:tmdb_id => movie.id, :title => movie.title, :rating => self._get_rating(movie.id), :release_date => movie.release_date}
-      end
-      return movies
-    rescue ArgumentError => tmdb_error
-      raise Movie::InvalidKeyError, tmdb_error.message
-    rescue RuntimeError => tmdb_error
-      if tmdb_error.message =~ /status code '404'/
-        raise Movie::InvalidKeyError, tmdb_error.message
+      movies_all = Tmdb::Movie.find(string)
+      if (!movies_all.nil?)
+        movies_all.each do |movie|
+          movies << {:tmdb_id => movie.id, :title => movie.title, :rating => self.rate(movie.id), :release_date => movie.release_date}
+        end
+        return movies
       else
-        raise RuntimeError, tmdb_error.message
+        movies_all = []
+        return movies_all
       end
+      
+    rescue Tmdb::InvalidApiKeyError
+       raise Movie::InvalidKeyError, 'Invalid API key'
     end
-end
+  end
 
-#Aziz
-def self.create_from_tmdb(tmdb_id)
-    Tmdb::Api.key("f4702b08c0ac6ea5b51425788bb26562")
-    detail = Tmdb::Movie.detail(tmdb_id)
+
+  def self.rate(tmdb_id)
+    puts tmdb_id
+    list_c = Tmdb::Movie.releases(tmdb_id)['countries']
     
-    Movie.create(title: detail["original_title"], rating: self._get_rating(tmdb_id), release_date: detail["release_date"], description: detail["overview"])
+      if(list_c != nil)
+          rate = list_c.find_all {|m| m['iso_3166_1'] == 'US'  }
+          
+          if(rate != nil)
+            
+            rate.each do |r|
+              if(self.all_ratings.include?(r['certification']))
+                return r['certification']
+              end
+            end
+            return "-"
+          else
+            return '-'
+          end
+      end
+  end    
+  
+def self.create_from_tmdb(tmdb_id)
+  begin
+    Tmdb::Api.key("f4702b08c0ac6ea5b51425788bb26562")
+    m_detail = Tmdb::Movie.detail(tmdb_id)
+    puts "adding..............."
+    Movie.create(title: m_detail["original_title"], rating: self.rate(tmdb_id) , release_date: m_detail["release_date"], description: m_detail["overview"])
+  rescue Tmdb::InvalidApiKeyError
+    raise Movie::InvalidKeyError, 'Invalid API key'
+  end
 end
 
-#Aziz
-def self._get_rating(tmdb_id)
-    rating = ''
-    Tmdb::Movie.releases(tmdb_id)["countries"].each do |r|
-      if r["iso_3166_1"] == "US"
-        rating = r["certification"]
-        break
-      end
-    end
-    return rating
-end
 end

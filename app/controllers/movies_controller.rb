@@ -82,7 +82,7 @@ class MoviesController < ApplicationController
   def add_tmdb
     m_to_add = params[:tmdb_movies]
     if m_to_add.nil?
-      flash[:notice] = "No movies were added"
+      flash[:notice] = "No movies selected"
     else
       m_keys = m_to_add.keys
       m_keys.each do |id|

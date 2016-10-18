@@ -87,8 +87,8 @@ class MoviesController < ApplicationController
       m_keys = m_to_add.keys
       m_keys.each do |id|
         Movie.create_from_tmdb(id)
-        flash[:notice] = "Movies successfully added to Rotten Potatoes"
       end
+      flash[:notice] = "Movies successfully added to Rotten Potatoes"
     end
     redirect_to movies_path
   end

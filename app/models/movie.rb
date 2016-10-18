@@ -44,7 +44,7 @@ class Movie::InvalidKeyError < StandardError ; end
                 return r['certification']
               end
             end
-            return "-"
+            return '-'
           else
             return '-'
           end

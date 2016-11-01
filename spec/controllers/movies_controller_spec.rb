@@ -59,19 +59,19 @@ describe MoviesController do
       post :search_tmdb, {:search_terms => 'Ted'}
       expect(response).to render_template('search_tmdb')
     end  
-    it 'should make the TMDb search results to search_tmdb page' do
+    it 'should make the TMDb search result to search_tmdb page' do
       fake_results = [double('movie1'), double('movie2')]
       allow(Movie).to receive(:find_in_tmdb).and_return (fake_results)
       post :search_tmdb, {:search_terms => 'Ted'}
       expect(assigns(:search_terms)).to eq('Ted')
     end
-    it 'should know about invalid search' do
+    it 'should know about invalid search cases' do
       fake_results = [double('movie1'), double('movie2')]
       allow(Movie).to receive(:find_in_tmdb).and_return (fake_results)
       post :search_tmdb, {:search_terms => nil}
       expect(response).to redirect_to '/movies'
     end
-    it 'should the same argument in result page' do
+    it 'should have the same argument in result page' do
       fake_results = [double('movie1'), double('movie2')]
       allow(Movie).to receive(:find_in_tmdb).and_return (fake_results)
       post :search_tmdb, {:search_terms => 'Ali'}
@@ -88,7 +88,7 @@ describe MoviesController do
   end
 end
 end
-  describe 'adding TMDb movies' do
+  describe 'add TMDbs movies' do
     before :each do
       @fake_results = [double('movie2')]
     end
@@ -97,28 +97,59 @@ end
       
       post :add_tmdb, {}
       
-      expect(flash[:notice]).to eq("No movies were added")
+      expect(flash[:notice]).to eq("No movies selected")
       expect(response).to redirect_to(movies_path)
       
     end
-end
+
     it 'should call function find with 1' do
       expect(Movie).to receive(:find).with("66")
       get :edit, {:id => "66"}
     end  
-
+end
   describe 'show movie' do
-    it 'should call function find' do
+    it 'should call function find on Movie' do
       expect(Movie).to receive(:find).with("66")
       get :show, {:id => "66"}
     end
-    it 'should select show function to render' do
+    it 'should render with show' do
       allow(Movie).to receive(:find)
       get :show, {:id => "66"}
       expect(response).to render_template('show')
     end
   end
 
+  describe "update a movie from the database" do
+    movie_new = {:title => "random title", :rating => "R", :description => "nothing", :release_date => "2016-12-10"}
+    before(:each) do
+      @movie = Movie.create! movie_new
+    end
+      update_param = {:title => "title updated"}
+      
+      it "should update the right movie" do
+        allow(Movie).to receive(:update_attributes!).with(update_param)
+        put :update, :id => @movie.id, :movie => update_param
+      end
+      it "should redirect to the movie page after it is done, update" do
+        allow(Movie).to receive(:update).with(update_param)
+        put :update, :id => @movie.id, :movie => update_param
+        expect(response).to redirect_to(movie_path(@movie))
+      end
+    end
+  
+  describe "delete a movie" do
+    movie_new = {:title => "random title", :rating => "R", :description => "nothing", :release_date => "2016-12-10"}
+    before(:each) do
+      @movie = Movie.create! movie_new
+    end
+      it "should delete the right movie" do
+        expect { delete :destroy, :id => @movie.id}.to change(Movie, :count).by(-1)
+      end
+      it "should redirect to the movie page after it is done, delete" do
+        delete :destroy, :id => @movie.id
+        expect(response).to redirect_to(movies_path)
+      end
+    end
 
 end
 

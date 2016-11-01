@@ -15,8 +15,30 @@ class Movie::InvalidKeyError < StandardError ; end
       movies = []
       movies_all = Tmdb::Movie.find(string)
       if (!movies_all.nil?)
+        #a = Tmdb::Movie.casts(movies_all[0].id)
         movies_all.each do |movie|
-          movies << {:tmdb_id => movie.id, :title => movie.title, :rating => self.rate(movie.id), :release_date => movie.release_date}
+          a = Tmdb::Movie.casts(movie.id)
+          name= "none"
+          
+          a.present?
+            name = ""
+            a.each_with_index do |a,i|
+              break if i==3
+              if name == ""
+                name = a['name']
+              else
+                name = name +" , "+ a['name']
+              end
+              
+            end
+            puts "#####"
+          
+          #puts movie.poster_path
+          pic = "http://andreakihlstedt.com/wpsys/wp-content/uploads/2013/07/NO.jpg"
+          if !movie.poster_path.blank?
+            pic = "http://image.tmdb.org/t/p/w185/" + movie.poster_path
+          end
+          movies << {:tmdb_id => movie.id, :title => movie.title, :rating => self.rate(movie.id), :release_date => movie.release_date, :name => name, :pic => pic}
         end
         return movies
       else

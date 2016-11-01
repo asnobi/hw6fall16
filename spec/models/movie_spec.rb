@@ -36,5 +36,16 @@ describe Movie do
     end
   end
   
+  describe 'ratings in home page' do
+    it 'should return all ratings' do
+      expect(Movie.all_ratings).to eq(["G", "PG", "PG-13", "NC-17", "R"])
+    end
+  end  
+  describe 'search for a movie and matching the right passing argument'do
+    it 'should return movies in search' do
+        search_terms = "Ted"
+        Movie.find_in_tmdb(search_terms).each {|movie| expect(movie[:title]).to include(search_terms)}
+      end
+    end  
   
 end

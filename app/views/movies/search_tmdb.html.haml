@@ -13,7 +13,7 @@
             - @movies.each do |movie|
                 %tr
                     %td= movie[:title] 
-                    %td= movie[:rating]
+                    %td= movie[:rating] 
                     %td= movie[:release_date]
                     %td=check_box_tag "tmdb_movies[#{movie[:tmdb_id]}]", nil, nil, :id=> "checkbox_#{movie[:tmdb_id]}"
                     
